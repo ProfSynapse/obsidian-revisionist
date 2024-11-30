@@ -137,7 +137,7 @@ export const AIModelMap: Record<AIProvider, AIModel[]> = {
             contextWindow: 128000
         },
         {
-            name: 'OpenAI GPT 4o',
+            name: 'OpenAI 4o',
             apiName: 'openai/gpt-4o-2024-11-20',
             capabilities: {
                 maxTokens: 16000,
@@ -150,7 +150,7 @@ export const AIModelMap: Record<AIProvider, AIModel[]> = {
             contextWindow: 128000
         },
         {
-            name: 'OpenAI GPT 4o Mini',
+            name: 'OpenAI 4o Mini',
             apiName: 'openai/gpt-4o-mini',
             capabilities: {
                 maxTokens: 16000,
@@ -159,6 +159,30 @@ export const AIModelMap: Record<AIProvider, AIModel[]> = {
             },
             inputCostPer1M: 0.15,
             outputCostPer1M: 0.60,
+            contextWindow: 128000
+        },
+        {
+            name: 'OpenAI o1 Mini',
+            apiName: 'openai/gpt-o1-mini',
+            capabilities: {
+                maxTokens: 66000,
+                supportsFunctions: true,
+                supportsStreaming: true
+            },
+            inputCostPer1M: 3.00,
+            outputCostPer1M: 12.00,
+            contextWindow: 128000
+        },
+        {
+            name: 'OpenAI o1 Preview',
+            apiName: 'openai/gpt-o1-preview',
+            capabilities: {
+                maxTokens: 33000,
+                supportsFunctions: true,
+                supportsStreaming: true
+            },
+            inputCostPer1M: 15.00,
+            outputCostPer1M: 60.00,
             contextWindow: 128000
         }
     ],

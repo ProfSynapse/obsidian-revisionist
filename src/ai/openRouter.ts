@@ -9,6 +9,9 @@ import { CONFIG } from '../config';
  * Handles communication with OpenRouter's API for various AI models
  */
 export class OpenRouterAdapter extends BaseAdapter {
+    public configure(config: Record<string, any>): void {
+    }
+
     protected async makeApiRequest(params: {
         model: string;
         prompt: string;

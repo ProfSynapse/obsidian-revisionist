@@ -1,6 +1,8 @@
+// src/settings/settingsTab.ts
+
 import { App, PluginSettingTab, Setting, Notice } from 'obsidian';
 import { AIProvider, AIModelMap } from '../ai/models';
-import { SettingsService } from './settingsService';
+import { SettingsService } from './settings';
 
 export class SettingTab extends PluginSettingTab {
     private settingsService: SettingsService;

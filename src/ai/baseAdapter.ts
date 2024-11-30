@@ -1,3 +1,5 @@
+// src/ai/baseAdapter.ts
+
 import { Notice, RequestUrlResponse } from 'obsidian';
 import { AIProvider, AIResponse, AIModel, AIModelMap } from './models';
 

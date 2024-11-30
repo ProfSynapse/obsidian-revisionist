@@ -1,3 +1,5 @@
+// config.ts
+
 /**
  * Shared configuration values for the plugin
  */

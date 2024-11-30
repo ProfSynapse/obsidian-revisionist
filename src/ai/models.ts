@@ -16,6 +16,12 @@ export interface AIResponse {
     data?: unknown;
     /** Error message if unsuccessful */
     error?: string;
+    /** Token usage information */
+    tokens?: {
+        input: number;
+        output: number;
+        total: number;
+    };
 }
 
 /**

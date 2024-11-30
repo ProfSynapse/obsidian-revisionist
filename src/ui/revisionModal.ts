@@ -6,6 +6,7 @@ interface RevisionModalResult {
     instructions: string;
     model: string;
     temperature: number;
+    selectedText: string;
 }
 
 export class RevisionModal extends Modal {
@@ -27,7 +28,8 @@ export class RevisionModal extends Modal {
         this.result = {
             instructions: '',
             model: settings.defaultModel,
-            temperature: settings.defaultTemperature
+            temperature: settings.defaultTemperature,
+            selectedText: this.selectedText
         };
     }
 
@@ -36,14 +38,6 @@ export class RevisionModal extends Modal {
 
         // Modal title
         contentEl.createEl('h2', { text: 'Revise Text' });
-
-        // Selected text preview
-        const previewSection = contentEl.createDiv({ cls: 'revision-preview' });
-        previewSection.createEl('h3', { text: 'Selected Text' });
-        const previewEl = previewSection.createEl('div', { 
-            cls: 'selected-text-preview',
-            text: this.selectedText
-        });
 
         // Instructions input
         const instructionsSection = contentEl.createDiv({ cls: 'revision-instructions' });

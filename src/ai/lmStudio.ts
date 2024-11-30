@@ -17,6 +17,7 @@ export class LMStudioAdapter extends BaseAdapter {
         temperature: number;
         maxTokens: number;
         rawResponse?: boolean;
+        selectedText?: string;  // Add this parameter
     }): Promise<RequestUrlResponse> {
         return await requestUrl({
             url: `http://localhost:${this.port}/v1/chat/completions`,
@@ -33,7 +34,10 @@ export class LMStudioAdapter extends BaseAdapter {
                     },
                     {
                         role: 'user',
-                        content: CONFIG.PROMPTS.formatUserPrompt(params.prompt)
+                        content: CONFIG.PROMPTS.formatUserPrompt(
+                            params.prompt,
+                            params.selectedText || ''  // Pass selected text
+                        )
                     }
                 ],
                 temperature: params.temperature,
@@ -48,6 +52,15 @@ export class LMStudioAdapter extends BaseAdapter {
             throw new Error('Invalid response format from LM Studio API');
         }
         return response.json.choices[0].message.content;
+    }
+
+    protected extractTokenCounts(response: RequestUrlResponse) {
+        const usage = response.json?.usage;
+        return {
+            input: usage?.prompt_tokens || 0,
+            output: usage?.completion_tokens || 0,
+            total: usage?.total_tokens || 0
+        };
     }
 
     public getProviderType(): AIProvider {

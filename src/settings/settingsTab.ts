@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting } from 'obsidian';
+import { App, PluginSettingTab, Setting, Notice } from 'obsidian';
 import { AIProvider, AIModelMap } from '../ai/models';
 import { SettingsService } from './settingsService';
 
@@ -54,6 +54,25 @@ export class SettingTab extends PluginSettingTab {
         }
     }
 
+    private async handleTestConnection(button: any) {
+        button.setButtonText('Testing...');
+        button.setDisabled(true);
+        
+        try {
+            const success = await this.plugin.testConnection();
+            if (success) {
+                new Notice('Connection test successful!');
+            } else {
+                new Notice('Connection test failed. Please check your settings.');
+            }
+        } catch (error) {
+            new Notice(`Connection test error: ${error.message}`);
+        } finally {
+            button.setButtonText('Test Connection');
+            button.setDisabled(false);
+        }
+    }
+
     private addOpenRouterSettings(containerEl: HTMLElement): void {
         const settings = this.settingsService.getSettings();
 
@@ -85,8 +104,7 @@ export class SettingTab extends PluginSettingTab {
                 button
                     .setButtonText('Test Connection')
                     .onClick(async () => {
-                        const success = await this.plugin.testConnection();
-                        // Notice is handled in the adapter
+                        await this.handleTestConnection(button);
                     });
             });
     }
@@ -132,8 +150,7 @@ export class SettingTab extends PluginSettingTab {
                 button
                     .setButtonText('Test Connection')
                     .onClick(async () => {
-                        const success = await this.plugin.testConnection();
-                        // Notice is handled in the adapter
+                        await this.handleTestConnection(button);
                     });
             });
     }

@@ -18,6 +18,7 @@ export class OpenRouterAdapter extends BaseAdapter {
         temperature: number;
         maxTokens: number;
         rawResponse?: boolean;
+        selectedText?: string;  // Add this parameter
     }): Promise<RequestUrlResponse> {
         return await requestUrl({
             url: 'https://openrouter.ai/api/v1/chat/completions',
@@ -37,7 +38,10 @@ export class OpenRouterAdapter extends BaseAdapter {
                     },
                     {
                         role: 'user',
-                        content: CONFIG.PROMPTS.formatUserPrompt(params.prompt)
+                        content: CONFIG.PROMPTS.formatUserPrompt(
+                            params.prompt,
+                            params.selectedText || ''  // Pass selected text
+                        )
                     }
                 ],
                 temperature: params.temperature,
@@ -52,6 +56,15 @@ export class OpenRouterAdapter extends BaseAdapter {
             throw new Error('Invalid response format from OpenRouter API');
         }
         return response.json.choices[0].message.content;
+    }
+
+    protected extractTokenCounts(response: RequestUrlResponse) {
+        const usage = response.json?.usage;
+        return {
+            input: usage?.prompt_tokens || 0,
+            output: usage?.completion_tokens || 0,
+            total: usage?.total_tokens || 0
+        };
     }
 
     public getProviderType(): AIProvider {

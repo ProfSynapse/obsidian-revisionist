@@ -13,7 +13,7 @@ import { ResultModal } from './ui/resultModal';
 import { OpenRouterAdapter } from './ai/openRouter';
 import { LMStudioAdapter } from './ai/lmStudio';
 import { BaseAdapter } from './ai/baseAdapter';
-import { AIProvider } from './ai/models';
+import { AIProvider, AIModelUtils } from './ai/models';
 
 export default class AIRevisionPlugin extends Plugin {
     private settingsService: SettingsService;
@@ -95,6 +95,32 @@ export default class AIRevisionPlugin extends Plugin {
     }
 
     /**
+     * Calculate approximate cost based on token usage and model rates
+     */
+    private calculateApproximateCost(tokens: { input: number; output: number }, modelName: string): { input: number; output: number; total: number } | undefined {
+        const model = AIModelUtils.getModelByApiName(modelName);
+        if (!model || !model.inputCostPer1M || !model.outputCostPer1M) {
+            return undefined;
+        }
+
+        const inputCost = (tokens.input / 1_000_000) * model.inputCostPer1M;
+        const outputCost = (tokens.output / 1_000_000) * model.outputCostPer1M;
+        
+        return {
+            input: inputCost,
+            output: outputCost,
+            total: inputCost + outputCost
+        };
+    }
+
+    /**
+     * Helper function to count words in text
+     */
+    private countWords(text: string): number {
+        return text.trim().split(/\s+/).length;
+    }
+
+    /**
      * Handle the text revision request from either command palette or context menu
      */
     private async handleRevisionRequest(editor: Editor) {
@@ -103,6 +129,13 @@ export default class AIRevisionPlugin extends Plugin {
         if (!selectedText) {
             new Notice('Please select text to revise');
             return;
+        }
+
+        const wordCount = this.countWords(selectedText);
+        const WORD_LIMIT = 800;
+
+        if (wordCount > WORD_LIMIT) {
+            new Notice(`Warning: Selected text is ${wordCount} words. The AI may struggle with more than ${WORD_LIMIT} words at once. Consider selecting a smaller portion.`, 10000);
         }
 
         // Check if adapter is ready
@@ -125,7 +158,8 @@ export default class AIRevisionPlugin extends Plugin {
                         result.model,
                         {
                             temperature: result.temperature,
-                            maxTokens: 2000  // Reasonable default
+                            maxTokens: 4096,
+                            selectedText: selectedText
                         }
                     );
 
@@ -133,7 +167,12 @@ export default class AIRevisionPlugin extends Plugin {
                         throw new Error(response.error || 'Failed to generate revision');
                     }
 
-                    // Show result modal
+                    // Calculate cost if tokens are available
+                    const cost = response.tokens ? 
+                        this.calculateApproximateCost(response.tokens, result.model) : 
+                        undefined;
+
+                    // Show result modal with cost
                     new ResultModal(
                         this.app,
                         {
@@ -141,14 +180,13 @@ export default class AIRevisionPlugin extends Plugin {
                             revisedText: response.data as string,
                             editor: editor,
                             onRetry: () => {
-                                // Reopen revision modal
                                 this.handleRevisionRequest(editor);
-                            }
+                            },
+                            cost: cost  // Simply pass the cost object without the isApproximate flag
                         }
                     ).open();
 
                 } catch (error) {
-                    console.error('Error in revision process:', error);
                     new Notice(`Error: ${error.message}`);
                 }
             }

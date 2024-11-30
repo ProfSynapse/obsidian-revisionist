@@ -5,6 +5,11 @@ interface ResultModalProps {
     revisedText: string;
     editor: Editor;
     onRetry: () => void;
+    cost?: {
+        total: number;
+        input: number;
+        output: number;
+    };
 }
 
 export class ResultModal extends Modal {
@@ -19,32 +24,29 @@ export class ResultModal extends Modal {
 
     onOpen() {
         const { contentEl } = this;
+        contentEl.addClass('result-modal');
 
         // Modal title
         contentEl.createEl('h2', { text: 'Review Revised Text' });
-
-        // Create comparison container
-        const comparisonContainer = contentEl.createDiv({ cls: 'comparison-container' });
-
-        // Original text section
-        const originalSection = comparisonContainer.createDiv({ cls: 'text-section' });
-        originalSection.createEl('h3', { text: 'Original Text' });
-        const originalTextEl = originalSection.createEl('div', {
-            cls: 'text-content',
-            text: this.props.originalText
-        });
-
-        // Revised text section
-        const revisedSection = comparisonContainer.createDiv({ cls: 'text-section' });
-        revisedSection.createEl('h3', { text: 'Revised Text (Editable)' });
+        
+        // Create container for revised text
+        const revisedSection = contentEl.createDiv({ cls: 'text-section' });
+        revisedSection.createEl('h3', { text: 'Revised Text' });
         
         // Create editable textarea for revised text
         this.revisedTextArea = new TextAreaComponent(revisedSection);
         this.revisedTextArea
             .setValue(this.props.revisedText)
             .setPlaceholder('Revised text will appear here...');
-        this.revisedTextArea.inputEl.rows = 8;
         this.revisedTextArea.inputEl.classList.add('revised-textarea');
+
+        // Add cost information if available
+        if (this.props.cost) {
+            const costInfo = contentEl.createDiv({ cls: 'cost-info' });
+            costInfo.createEl('span', { 
+                text: `Cost: $${this.props.cost.total.toFixed(4)} (Input: $${this.props.cost.input.toFixed(4)}, Output: $${this.props.cost.output.toFixed(4)})` 
+            });
+        }
 
         // Create button container
         const buttonContainer = contentEl.createDiv({ cls: 'button-container' });

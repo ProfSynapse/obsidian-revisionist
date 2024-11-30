@@ -1,10 +1,13 @@
 import { Notice, RequestUrlResponse } from 'obsidian';
-import { AIProvider, AIResponse, AIModel, AIModelMap, AIResponseOptions } from './models';
+import { AIProvider, AIResponse, AIModel, AIModelMap } from './models';
 
-/**
- * Abstract base class for AI service adapters
- * Provides common functionality and enforces consistent interface
- */
+export interface AIResponseOptions {
+    temperature?: number;
+    maxTokens?: number;
+    rawResponse?: boolean;
+    selectedText?: string;
+}
+
 export abstract class BaseAdapter {
     protected apiKey: string = '';
     protected models: AIModel[] = [];
@@ -29,9 +32,16 @@ export abstract class BaseAdapter {
         temperature: number;
         maxTokens: number;
         rawResponse?: boolean;
+        selectedText?: string;
     }): Promise<RequestUrlResponse>;
 
     protected abstract extractContentFromResponse(response: RequestUrlResponse): string;
+
+    protected abstract extractTokenCounts(response: RequestUrlResponse): {
+        input: number;
+        output: number;
+        total: number;
+    };
 
     abstract getProviderType(): AIProvider;
 
@@ -62,11 +72,18 @@ export abstract class BaseAdapter {
                 prompt,
                 temperature,
                 maxTokens,
-                rawResponse: options?.rawResponse
+                rawResponse: options?.rawResponse,
+                selectedText: options?.selectedText || ''
             });
 
             const content = this.extractContentFromResponse(response);
-            return { success: true, data: content };
+            const tokens = this.extractTokenCounts(response);
+
+            return { 
+                success: true, 
+                data: content,
+                tokens
+            };
 
         } catch (error) {
             return this.handleError(error);
@@ -85,7 +102,7 @@ export abstract class BaseAdapter {
             const response = await this.generateResponse(
                 "Return the word 'OK'.",
                 this.models[0].apiName,
-                { rawResponse: true }
+                { rawResponse: true, selectedText: '' }
             );
 
             if (!response.success || typeof response.data !== 'string') {

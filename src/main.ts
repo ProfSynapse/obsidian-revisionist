@@ -3,7 +3,8 @@ import {
     Plugin, 
     Editor,
     Menu,
-    Notice
+    Notice,
+    MarkdownView
 } from 'obsidian';
 
 import { SettingsService } from './settings/settingsService';
@@ -33,6 +34,19 @@ export default class AIRevisionPlugin extends Plugin {
             this,
             this.settingsService
         ));
+
+        // Add ribbon icon for mobile-friendly access
+        this.addRibbonIcon('wand-2', 'Revise Selected Text', () => {
+            const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
+            if (activeView?.editor) {
+                const selectedText = activeView.editor.getSelection();
+                if (selectedText) {
+                    this.handleRevisionRequest(activeView.editor);
+                } else {
+                    new Notice('Please select text to revise');
+                }
+            }
+        });
 
         // Add command to command palette
         this.addCommand({

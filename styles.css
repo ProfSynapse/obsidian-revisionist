@@ -1,0 +1,69 @@
+/* Revision Modal Styles */
+.revision-modal .selected-text-preview {
+    max-height: 100px;
+    overflow-y: auto;
+    padding: 8px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+    margin-bottom: 16px;
+    background-color: var(--background-secondary);
+}
+
+.revision-modal .button-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.revision-modal .temperature-control {
+    margin-top: 16px;
+}
+
+/* Result Modal Styles */
+.result-modal .comparison-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 16px;
+    max-height: 60vh;
+}
+
+.result-modal .text-section {
+    flex: 1;
+}
+
+.result-modal .text-content {
+    padding: 8px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+    background-color: var(--background-secondary);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.result-modal .revised-textarea {
+    width: 100%;
+    min-height: 200px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+    padding: 8px;
+    background-color: var(--background-primary);
+    font-family: inherit;
+}
+
+.result-modal .button-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.result-modal button {
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+
+.result-modal button.mod-cta {
+    font-weight: bold;
+}

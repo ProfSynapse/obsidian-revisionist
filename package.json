@@ -1,0 +1,29 @@
+{
+    "name": "obsidian-revisionist",
+    "version": "0.0.1",
+    "description": "AI-powered text revision plugin for Obsidian",
+    "main": "main.js",
+    "scripts": {
+      "dev": "node esbuild.config.mjs",
+      "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+      "version": "node version-bump.mjs && git add manifest.json versions.json"
+    },
+    "keywords": [
+      "obsidian",
+      "plugin",
+      "ai",
+      "revision"
+    ],
+    "author": "Synaptic Labs",
+    "license": "MIT",
+    "devDependencies": {
+      "@types/node": "^16.11.6",
+      "@typescript-eslint/eslint-plugin": "^5.2.0",
+      "@typescript-eslint/parser": "^5.2.0",
+      "builtin-modules": "^3.2.0",
+      "esbuild": "^0.13.12",
+      "obsidian": "^1.4.0",
+      "tslib": "2.3.1",
+      "typescript": "4.4.4"
+    }
+  }

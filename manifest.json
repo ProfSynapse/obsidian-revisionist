@@ -1,9 +1,9 @@
 {
-    "id": "obsidian-revisionist",
+    "id": "revisionist",
     "name": "Revisionist",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "minAppVersion": "1.7.2",
-    "description": "AI-powered text revision plugin for Obsidian",
+    "description": "AI-powered text revision plugin",
     "author": "Synaptic Labs",
     "authorUrl": "https://www.synapticlabs.ai",
     "isDesktopOnly": false

@@ -86,6 +86,8 @@ export class SettingTab extends PluginSettingTab {
                     .setValue(settings.apiKeys[AIProvider.OpenRouter])
                     .onChange(async (value) => {
                         await this.settingsService.setApiKey(AIProvider.OpenRouter, value);
+                        // Immediately update the adapter with new key
+                        this.plugin.updateAdapterConfig();
                     });
                 text.inputEl.type = 'password';
             })
@@ -183,21 +185,11 @@ export class SettingTab extends PluginSettingTab {
             .setDesc('Set the default temperature for the AI model (0.0 - 1.0)')
             .addSlider(slider => {
                 slider
-                    .setLimits(0, 1, 0.1)
+                    .setLimits(0, 1, 0.05)
                     .setValue(settings.defaultTemperature)
                     .setDynamicTooltip()
                     .onChange(async (value) => {
                         await this.settingsService.updateSetting('defaultTemperature', value);
-                    });
-            })
-            .addText(text => {
-                text
-                    .setValue(settings.defaultTemperature.toString())
-                    .onChange(async (value) => {
-                        const temp = parseFloat(value);
-                        if (!isNaN(temp) && temp >= 0 && temp <= 1) {
-                            await this.settingsService.updateSetting('defaultTemperature', temp);
-                        }
                     });
             });
     }

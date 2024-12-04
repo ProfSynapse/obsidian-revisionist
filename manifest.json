@@ -6,5 +6,5 @@
     "description": "AI-powered text revision plugin for Obsidian",
     "author": "Synaptic Labs",
     "authorUrl": "https://www.synapticlabs.ai",
-    "isDesktopOnly": true
+    "isDesktopOnly": false
 }

@@ -33,6 +33,7 @@ export abstract class BaseAdapter {
         maxTokens: number;
         rawResponse?: boolean;
         selectedText?: string;
+        isTest?: boolean;
     }): Promise<RequestUrlResponse>;
 
     protected abstract extractContentFromResponse(response: RequestUrlResponse): string;
@@ -96,20 +97,27 @@ export abstract class BaseAdapter {
     public async testConnection(): Promise<boolean> {
         try {
             if (!this.isReady()) {
+                console.log('Adapter not ready during test connection');
                 return false;
             }
 
-            const response = await this.generateResponse(
-                "Return the word 'OK'.",
-                this.models[0].apiName,
-                { rawResponse: true, selectedText: '' }
-            );
+            console.log('Testing connection with model:', this.models[0]?.apiName);
+            
+            const response = await this.makeApiRequest({
+                model: this.models[0]?.apiName || '',
+                prompt: 'Hi',
+                temperature: 0.7,
+                maxTokens: 10,
+                rawResponse: true,
+                isTest: true
+            });
 
-            if (!response.success || typeof response.data !== 'string') {
-                return false;
-            }
+            console.log('Test connection response:', {
+                status: response.status,
+                hasContent: !!response.json?.choices?.[0]?.message?.content
+            });
 
-            return response.data.toLowerCase().includes('ok');
+            return response.status === 200 && !!response.json?.choices?.[0]?.message?.content;
         } catch (error) {
             console.error(`Error in ${this.getProviderType()} test connection:`, error);
             return false;
@@ -120,9 +128,20 @@ export abstract class BaseAdapter {
      * Handle errors uniformly across adapters
      */
     protected handleError(error: unknown): AIResponse {
-        console.error(`Error in ${this.getProviderType()} API call:`, error);
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-        new Notice(`${this.getProviderType()} API Error: ${errorMessage}`);
+        const provider = this.getProviderType();
+        console.error(`Error in ${provider} API call:`, error);
+        
+        let errorMessage = 'Unknown error occurred';
+        if (error instanceof Error) {
+            errorMessage = error.message;
+            console.error('Error stack:', error.stack);
+        }
+        
+        if ('response' in (error as any)) {
+            console.error('API Response:', (error as any).response);
+        }
+
+        new Notice(`${provider} API Error: ${errorMessage}`);
         return { success: false, error: errorMessage };
     }
 
@@ -175,7 +194,15 @@ export abstract class BaseAdapter {
      * Check if adapter is properly configured
      */
     public isReady(): boolean {
-        return (!!this.apiKey || this.getProviderType() === AIProvider.LMStudio) && this.models.length > 0;
+        const ready = (!!this.apiKey || this.getProviderType() === AIProvider.LMStudio) && this.models.length > 0;
+        if (!ready) {
+            console.warn(`${this.getProviderType()} adapter not ready:`, {
+                hasApiKey: !!this.apiKey,
+                provider: this.getProviderType(),
+                modelsCount: this.models.length
+            });
+        }
+        return ready;
     }
 
     /**

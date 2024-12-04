@@ -1,3 +1,5 @@
+// src/ui/resultModal.ts
+
 import { App, Modal, TextAreaComponent, Editor, Notice } from 'obsidian';
 
 interface ResultModalProps {

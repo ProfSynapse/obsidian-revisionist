@@ -1,3 +1,5 @@
+// src/ai/lmStudio.ts
+
 import { requestUrl, RequestUrlResponse } from 'obsidian';
 import { AIProvider } from './models';
 import { BaseAdapter } from './baseAdapter';

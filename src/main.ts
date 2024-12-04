@@ -7,7 +7,7 @@ import {
     MarkdownView
 } from 'obsidian';
 
-import { SettingsService } from './settings/settingsService';
+import { SettingsService } from './settings/settings';
 import { SettingTab } from './settings/settingsTab';
 import { RevisionModal } from './ui/revisionModal';
 import { ResultModal } from './ui/resultModal';

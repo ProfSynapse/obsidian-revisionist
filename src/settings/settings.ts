@@ -1,3 +1,5 @@
+// src/sttings/settings.ts
+
 import { AIProvider } from '../ai/models';
 
 /**

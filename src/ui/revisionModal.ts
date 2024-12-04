@@ -1,6 +1,8 @@
+// src/ui/revisionModal.ts
+
 import { App, Modal, Setting, TextAreaComponent, DropdownComponent, Notice } from 'obsidian';
 import { AIProvider, AIModelMap } from '../ai/models';
-import { SettingsService } from '../settings/settingsService';
+import { SettingsService } from '../settings/settings';
 
 interface RevisionModalResult {
     instructions: string;

@@ -146,7 +146,7 @@ export abstract class BaseAdapter {
     /**
      * Handle errors uniformly across adapters
      */
-    protected handleError(error: unknown): AIResponse {
+    protected handleError(error: unknown): APIResponse<string> {
         const provider = this.getProviderType();
         console.error(`Error in ${provider} API call:`, error);
         
@@ -161,7 +161,7 @@ export abstract class BaseAdapter {
         }
 
         new Notice(`${provider} API Error: ${errorMessage}`);
-        return { success: false, error: errorMessage };
+        return { success: false, error: errorMessage, data: '' };
     }
 
     /**

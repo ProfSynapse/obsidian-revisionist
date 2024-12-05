@@ -95,7 +95,6 @@ export class ResultModal extends Modal {
             new Notice('Copied to clipboard');
         } catch (error) {
             new Notice('Failed to copy to clipboard');
-            console.error('Failed to copy:', error);
         }
     }
 

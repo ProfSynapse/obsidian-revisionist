@@ -103,7 +103,6 @@ export default class AIRevisionPlugin extends Plugin {
                 });
                 break;
             default:
-                console.error('Unknown provider:', settings.provider);
                 return;
         }
     }

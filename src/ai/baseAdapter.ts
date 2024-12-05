@@ -10,6 +10,28 @@ export interface AIResponseOptions {
     selectedText?: string;
 }
 
+export interface TokenCount {
+    input: number;
+    output: number;
+    total: number;
+}
+
+export interface APIRequestParams {
+    model: string;
+    prompt: string;
+    temperature: number;
+    maxTokens: number;
+    rawResponse?: boolean;
+    selectedText?: string;
+}
+
+export interface APIResponse<T = unknown> {
+    success: boolean;
+    data: T;
+    tokens?: TokenCount;
+    error?: string;
+}
+
 export abstract class BaseAdapter {
     protected apiKey: string = '';
     protected models: AIModel[] = [];
@@ -23,27 +45,16 @@ export abstract class BaseAdapter {
      * Configure provider-specific settings
      * @param config Configuration object specific to the provider
      */
-    abstract configure(config: Record<string, any>): void;
+    abstract configure(config: Record<string, unknown>): void;
 
     /**
      * Methods that must be implemented by specific adapters
      */
-    protected abstract makeApiRequest(params: {
-        model: string;
-        prompt: string;
-        temperature: number;
-        maxTokens: number;
-        rawResponse?: boolean;
-        selectedText?: string;
-    }): Promise<RequestUrlResponse>;
+    protected abstract makeApiRequest(params: APIRequestParams): Promise<RequestUrlResponse>;
 
     protected abstract extractContentFromResponse(response: RequestUrlResponse): string;
 
-    protected abstract extractTokenCounts(response: RequestUrlResponse): {
-        input: number;
-        output: number;
-        total: number;
-    };
+    protected abstract extractTokenCounts(response: RequestUrlResponse): TokenCount;
 
     abstract getProviderType(): AIProvider;
 
@@ -54,7 +65,7 @@ export abstract class BaseAdapter {
         prompt: string,
         modelApiName: string,
         options?: AIResponseOptions
-    ): Promise<AIResponse> {
+    ): Promise<APIResponse<string>> {
         try {
             const apiModel = this.getApiModelName(modelApiName);
             if (!apiModel) {
@@ -113,7 +124,6 @@ export abstract class BaseAdapter {
 
             return response.data.toLowerCase().includes('ok');
         } catch (error) {
-            console.error(`Error in ${this.getProviderType()} test connection:`, error);
             return false;
         }
     }
@@ -121,11 +131,10 @@ export abstract class BaseAdapter {
     /**
      * Handle errors uniformly across adapters
      */
-    protected handleError(error: unknown): AIResponse {
-        console.error(`Error in ${this.getProviderType()} API call:`, error);
+    protected handleError(error: unknown): APIResponse<string> {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
         new Notice(`${this.getProviderType()} API Error: ${errorMessage}`);
-        return { success: false, error: errorMessage };
+        return { success: false, data: '', error: errorMessage };
     }
 
     /**
@@ -146,7 +155,6 @@ export abstract class BaseAdapter {
                 throw new Error('Failed to validate API key');
             }
         } catch (error) {
-            console.error(`Error validating ${this.getProviderType()} API key:`, error);
             new Notice(`Failed to validate ${this.getProviderType()} API key: ${error instanceof Error ? error.message : 'Unknown error occurred'}`);
             return false;
         }
@@ -186,7 +194,6 @@ export abstract class BaseAdapter {
     public getApiModelName(modelApiName: string): string {
         const model = this.models.find(m => m.apiName === modelApiName);
         if (!model) {
-            console.warn(`Model ${modelApiName} not found for ${this.getProviderType()}. Using first available model.`);
             return this.models[0]?.apiName || modelApiName;
         }
         return model.apiName;

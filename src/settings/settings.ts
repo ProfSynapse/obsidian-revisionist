@@ -14,6 +14,7 @@ export interface PluginSettings {
         port: string;
         modelName: string;
     };
+    debugMode: boolean;
 }
 
 /**
@@ -30,7 +31,8 @@ export const DEFAULT_SETTINGS: PluginSettings = {
     lmStudio: {
         port: '1234',
         modelName: 'default'
-    }
+    },
+    debugMode: false
 };
 
 /**
@@ -143,5 +145,12 @@ export class SettingsService {
     async resetSettings(): Promise<void> {
         this.settings = { ...DEFAULT_SETTINGS };
         await this.saveSettings();
+    }
+
+    /**
+     * Check if debug mode is enabled
+     */
+    isDebugMode(): boolean {
+        return this.settings.debugMode;
     }
 }

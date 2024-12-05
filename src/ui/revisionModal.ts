@@ -77,35 +77,16 @@ export class RevisionModal extends Modal {
         }
 
         // Temperature control
-        const temperatureContainer = contentEl.createDiv({ cls: 'temperature-control' });
-        new Setting(temperatureContainer)
+        new Setting(contentEl)
             .setName('Temperature')
             .setDesc('Higher values make the output more creative, lower values make it more consistent')
             .addSlider(slider => {
-                this.temperatureSlider = slider.sliderEl;
                 slider
-                    .setLimits(0, 1, 0.1)
+                    .setLimits(0, 1, 0.05)
                     .setValue(this.result.temperature)
                     .setDynamicTooltip()
                     .onChange(value => {
                         this.result.temperature = value;
-                        if (this.temperatureText) {
-                            this.temperatureText.value = value.toString();
-                        }
-                    });
-            })
-            .addText(text => {
-                this.temperatureText = text.inputEl;
-                text
-                    .setValue(this.result.temperature.toString())
-                    .onChange(value => {
-                        const temp = parseFloat(value);
-                        if (!isNaN(temp) && temp >= 0 && temp <= 1) {
-                            this.result.temperature = temp;
-                            if (this.temperatureSlider) {
-                                this.temperatureSlider.value = temp.toString();
-                            }
-                        }
                     });
             });
 

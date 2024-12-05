@@ -1,63 +1,59 @@
-# Revisionist
+# Revisionist: AI-Powered Text Revision Plugin for Obsidian
 
-An AI-powered text revision plugin for Obsidian that helps you improve your writing while maintaining your original style and tone.
+> **Make your writing shine with AI!** Revisionist provides seamless AI-powered text revision directly within Obsidian. Highlight text, tweak instructions, and get instant, polished suggestions.
+
+---
 
 ## Features
 
-- One-click text revision using AI
-- Support for multiple AI providers:
-  - OpenRouter (Claude, GPT, etc.)
-  - Local LM Studio models
-- Context menu integration
-- Mobile-friendly ribbon icon
-- Custom revision instructions
-- Cost estimation for API-based models
+- **One-Click AI Revisions**: Highlight text and let Revisionist refine it for you.
+- **Customizable Instructions**: Guide the AI with specific directions for revisions.
+- **Mobile and Desktop Friendly**:
+  - Access via the ribbon icon, command palette, or context menu.
+- **Word Count Guidance**: Helps you stay within optimal text limits for better AI performance.
+- **Error Notifications**: Provides clear feedback if settings or inputs need adjustment.
+
+---
 
 ## Installation
 
-1. Open Obsidian Settings
-2. Go to Community Plugins and disable Safe Mode
-3. Click Browse and search for "Revisionist"
-4. Click Install
-5. Enable the plugin
+1. Open Obsidian.
+2. Go to **Settings > Community Plugins**.
+3. Search for **Revisionist** in the plugin library.
+4. Click **Install** and then **Enable** the plugin.
 
-## Configuration
-
-### OpenRouter Setup
-1. Go to plugin settings
-2. Select "OpenRouter" as your provider
-3. Enter your OpenRouter API key
-4. Choose a default AI model
-
-### LM Studio Setup
-1. Go to plugin settings
-2. Select "LM Studio" as your provider
-3. Enter the port number for your local LM Studio instance
-4. Specify your local model name
-5. Test the connection using the "Test Connection" button
+---
 
 ## Usage
 
-1. Select the text you want to revise in your note
-2. Choose one of three ways to start revision:
-   - Click the wand icon in the ribbon
-   - Use the command palette and search for "Revise Selected Text"
-   - Right-click and select "Revise with AI" from the context menu
-3. Enter your revision instructions in the modal
-4. Adjust the AI model and temperature if needed
-5. Click "Generate" to start the revision
-6. Review the changes in the result modal
-7. Choose to:
-   - Apply the changes
-   - Try again with different instructions
-   - Cancel and keep your original text
+### Revise Your Writing
+1. **Select Text**:
+   - Highlight the text you want to improve.
+2. **Trigger Revision**:
+   - Click the **wand icon** in the ribbon.
+   - Or open the **Command Palette** (Ctrl+P or Cmd+P) and search for "Revise Selected Text."
+   - Or right-click the selected text and choose **Revise with AI**.
+3. **Configure Revision**:
+   - In the revision modal:
+     - Add specific instructions (e.g., "Make this more concise" or "Rewrite for clarity").
+     - Optionally adjust settings like temperature.
+4. **Review Results**:
+   - The plugin will generate a revised version of your text.
+   - You can choose to retry, accept, or modify the revision.
 
-## Note
+---
 
-- The plugin will warn you when selecting more than 800 words
-- Cost estimation is provided for API-based models, but it is no perfect.
-- The system maintains your writing style unless instructed otherwise
+## Configuration
 
-## License
+1. Open **Settings > Revisionist**.
+2. Select your preferred AI provider (e.g., OpenRouter or LMStudio).
+3. Configure any additional parameters like temperature, model, or API key (if needed).
 
-MIT License - See LICENSE file for details.
+---
+
+## Tips for Best Results
+
+- **Keep it Short**: Select smaller portions of text (under 800 words) for optimal performance.
+- **Clear Instructions**: Provide specific guidance to the AI for more accurate revisions.
+- **Experiment with Settings**: Adjust parameters like temperature to fine-tune the AI's creativity.
+

@@ -83,27 +83,61 @@ export default class AIRevisionPlugin extends Plugin {
      */
     private initializeAIAdapter() {
         const settings = this.settingsService.getSettings();
+        console.log('Initializing AI adapter with provider:', settings.provider);
         
         // Clean up existing adapter if needed
         if (this.aiAdapter) {
-            // Any cleanup needed
+            console.log('Cleaning up existing adapter');
         }
 
-        // Create new adapter based on provider
-        switch (settings.provider) {
-            case AIProvider.OpenRouter:
-                this.aiAdapter = new OpenRouterAdapter();
-                this.aiAdapter.setApiKey(settings.apiKeys[AIProvider.OpenRouter]);
-                break;
-            case AIProvider.LMStudio:
-                this.aiAdapter = new LMStudioAdapter();
-                this.aiAdapter.configure({
-                    port: settings.lmStudio.port,
-                    modelName: settings.lmStudio.modelName
-                });
-                break;
-            default:
-                return;
+        try {
+            // Create new adapter based on provider
+            switch (settings.provider) {
+                case AIProvider.OpenRouter:
+                    console.log('Creating OpenRouter adapter');
+                    this.aiAdapter = new OpenRouterAdapter();
+                    if (!settings.apiKeys[AIProvider.OpenRouter]) {
+                        console.warn('OpenRouter API key is not set');
+                    }
+                    this.aiAdapter.setApiKey(settings.apiKeys[AIProvider.OpenRouter]);
+                    break;
+                case AIProvider.LMStudio:
+                    console.log('Creating LMStudio adapter');
+                    this.aiAdapter = new LMStudioAdapter();
+                    this.aiAdapter.configure({
+                        port: settings.lmStudio.port,
+                        modelName: settings.lmStudio.modelName
+                    });
+                    break;
+                default:
+                    console.error('Unknown provider:', settings.provider);
+                    return;
+            }
+            console.log('AI adapter initialized successfully');
+        } catch (error) {
+            console.error('Failed to initialize AI adapter:', error);
+            new Notice('Failed to initialize AI provider. Check console for details.');
+        }
+    }
+
+    /**
+     * Update adapter configuration with current settings
+     */
+    updateAdapterConfig() {
+        const settings = this.settingsService.getSettings();
+        
+        if (!this.aiAdapter) {
+            this.initializeAIAdapter();
+            return;
+        }
+
+        if (settings.provider === AIProvider.OpenRouter) {
+            this.aiAdapter.setApiKey(settings.apiKeys[AIProvider.OpenRouter]);
+        } else if (settings.provider === AIProvider.LMStudio) {
+            this.aiAdapter.configure({
+                port: settings.lmStudio.port,
+                modelName: settings.lmStudio.modelName
+            });
         }
     }
 
@@ -212,6 +246,11 @@ export default class AIRevisionPlugin extends Plugin {
      * Test the connection to the current AI provider
      */
     async testConnection(): Promise<boolean> {
+        console.log('Testing connection to AI provider');
+        if (!this.aiAdapter) {
+            console.error('No AI adapter initialized');
+            return false;
+        }
         return this.aiAdapter.testConnection();
     }
 

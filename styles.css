@@ -14,6 +14,12 @@
     justify-content: flex-end;
     gap: 8px;
     margin-top: 16px;
+    padding: 0 8px;
+}
+
+.revision-modal .button-container button {
+    min-width: 80px;
+    padding: 6px 12px;
 }
 
 .revision-modal .temperature-control {
@@ -63,4 +69,63 @@
 
 .result-modal button.mod-cta {
     font-weight: bold;
+}
+
+.quick-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px; /* Reduced from 24px */
+    margin: 24px auto;
+    padding: 0 16px;
+    max-width: 900px; /* Slightly reduced from 1200px */
+}
+
+.quick-button {
+    flex: 0 1 250px; /* Wider buttons */
+    display: flex;
+    flex-direction: row; /* Keep icon and text in a row */
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    text-align: center;
+    min-width: 0;
+    font-size: 1em;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.quick-button:hover {
+    filter: brightness(1.1);
+}
+
+.quick-button-icon {
+    font-size: 1.2em;
+    display: block; /* Make icon its own line */
+    margin-bottom: 4px;
+}
+
+.button-container {
+    display: flex;
+    justify-content: flex-end; /* Right align */
+    gap: 8px;
+    margin: 24px 16px 16px;
+    padding-right: 8px;
+}
+
+.button-container button {
+    min-width: 80px;
+}
+
+.revision-instructions textarea {
+    width: 100%;
+    min-width: 400px;
+}
+
+.revision-instructions .setting-item {
+    width: 100%;
+    padding-right: 32px;
 }

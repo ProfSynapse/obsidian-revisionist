@@ -72,7 +72,7 @@ export abstract class BaseAdapter {
     public async generateResponse(
         prompt: string,
         modelApiName: string,
-        options?: AIResponseOptions
+        options?: AIResponseOptions & { fullNote?: string }
     ): Promise<APIResponse<string>> {
         try {
             const apiModel = this.getApiModelName(modelApiName);
@@ -94,7 +94,8 @@ export abstract class BaseAdapter {
                 temperature,
                 maxTokens,
                 rawResponse: options?.rawResponse,
-                selectedText: options?.selectedText || ''
+                selectedText: options?.selectedText || '',
+                isTest: false
             });
 
             const content = this.extractContentFromResponse(response);

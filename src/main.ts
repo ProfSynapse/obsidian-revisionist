@@ -172,6 +172,7 @@ export default class AIRevisionPlugin extends Plugin {
      */
     private async handleRevisionRequest(editor: Editor) {
         const selectedText = editor.getSelection();
+        const fullNoteContent = editor.getValue();  // Get full note content
         
         if (!selectedText) {
             new Notice('Please select text to revise');
@@ -196,6 +197,7 @@ export default class AIRevisionPlugin extends Plugin {
             this.app,
             this.settingsService,
             selectedText,
+            fullNoteContent,  // Pass full note content
             async (result) => {
                 try {
                     new Notice('Generating revision...');
@@ -206,7 +208,8 @@ export default class AIRevisionPlugin extends Plugin {
                         {
                             temperature: result.temperature,
                             maxTokens: 4096,
-                            selectedText: selectedText
+                            selectedText: selectedText,
+                            fullNote: fullNoteContent // Pass fullNote here
                         }
                     );
 

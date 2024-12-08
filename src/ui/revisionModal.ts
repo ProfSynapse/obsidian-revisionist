@@ -1,14 +1,16 @@
 // src/ui/revisionModal.ts
 
-import { App, Modal, Setting, TextAreaComponent, DropdownComponent, Notice } from 'obsidian';
+import { App, Modal, Setting, TextAreaComponent, DropdownComponent, ButtonComponent, Notice } from 'obsidian';
 import { AIProvider, AIModelMap } from '../ai/models';
 import { SettingsService } from '../settings/settings';
+import { CONFIG, SuggestionPrompt } from '../config'; // Import CONFIG and SuggestionPrompt
 
 interface RevisionModalResult {
     instructions: string;
     model: string;
     temperature: number;
     selectedText: string;
+    fullNoteContent: string;  // Add this field
 }
 
 export class RevisionModal extends Modal {
@@ -22,6 +24,7 @@ export class RevisionModal extends Modal {
         app: App,
         private settingsService: SettingsService,
         private selectedText: string,
+        private fullNoteContent: string,  // Add this parameter
         private onSubmit: (result: RevisionModalResult) => void
     ) {
         super(app);
@@ -31,7 +34,8 @@ export class RevisionModal extends Modal {
             instructions: '',
             model: settings.defaultModel,
             temperature: settings.defaultTemperature,
-            selectedText: this.selectedText
+            selectedText: this.selectedText,
+            fullNoteContent: this.fullNoteContent  // Store it in result
         };
     }
 
@@ -40,6 +44,30 @@ export class RevisionModal extends Modal {
 
         // Modal title
         contentEl.createEl('h2', { text: 'Revise Text' });
+
+        // Quick prompt buttons
+        const quickButtonsSection = contentEl.createDiv({ cls: 'quick-buttons' });
+        CONFIG.SUGGESTION_PROMPTS.forEach((prompt: SuggestionPrompt) => { // Specify type for prompt
+            const buttonContainer = quickButtonsSection.createDiv();
+            const button = new ButtonComponent(buttonContainer)
+                .setClass('quick-button')
+                .setButtonText(prompt.type.toUpperCase())
+                .onClick(() => {
+                    this.result.instructions = prompt.prompt;
+                    this.onSubmit(this.result);
+                    this.close();
+                });
+
+            // Set button style
+            button.buttonEl.style.backgroundColor = prompt.color;
+            button.buttonEl.style.color = 'white';
+            
+            // Add icon
+            button.buttonEl.createSpan({
+                cls: 'quick-button-icon',
+                text: prompt.icon
+            });
+        });
 
         // Instructions input
         const instructionsSection = contentEl.createDiv({ cls: 'revision-instructions' });
@@ -93,26 +121,22 @@ export class RevisionModal extends Modal {
         // Buttons
         const buttonContainer = contentEl.createDiv({ cls: 'button-container' });
         
-        // Submit button
-        const submitButton = buttonContainer.createEl('button', { 
-            text: 'Submit',
-            cls: 'mod-cta'
-        });
-        submitButton.addEventListener('click', () => {
-            if (!this.validateInput()) {
-                return;
-            }
-            this.onSubmit(this.result);
-            this.close();
-        });
+        new ButtonComponent(buttonContainer)
+            .setButtonText('Submit')
+            .setCta()
+            .onClick(() => {
+                if (!this.validateInput()) {
+                    return;
+                }
+                this.onSubmit(this.result);
+                this.close();
+            });
 
-        // Cancel button
-        const cancelButton = buttonContainer.createEl('button', { 
-            text: 'Cancel'
-        });
-        cancelButton.addEventListener('click', () => {
-            this.close();
-        });
+        new ButtonComponent(buttonContainer)
+            .setButtonText('Cancel')
+            .onClick(() => {
+                this.close();
+            });
 
         // Focus instructions field
         this.instructionsEl.inputEl.focus();

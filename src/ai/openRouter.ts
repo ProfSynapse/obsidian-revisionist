@@ -18,6 +18,7 @@ export class OpenRouterAdapter extends BaseAdapter {
         prompt: string;
         temperature: number;
         maxTokens: number;
+        fullNote: string; // Add this parameter
         rawResponse?: boolean;
         selectedText?: string;
         isTest?: boolean;  // Add this parameter
@@ -41,7 +42,8 @@ export class OpenRouterAdapter extends BaseAdapter {
                         role: 'user',
                         content: CONFIG.PROMPTS.formatUserPrompt(
                             params.prompt,
-                            params.selectedText || ''
+                            params.selectedText || '',
+                            params.fullNote // Pass the fullNote here
                         )
                     }
                 ];

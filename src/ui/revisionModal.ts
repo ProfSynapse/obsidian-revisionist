@@ -46,11 +46,12 @@ export class RevisionModal extends Modal {
         contentEl.createEl('h2', { text: 'Revise Text' });
 
         // Quick prompt buttons
-        const quickButtonsSection = contentEl.createDiv({ cls: 'quick-buttons' });
+        const quickButtonsSection = contentEl.createDiv({ cls: 'quick-buttons-grid' });
         CONFIG.SUGGESTION_PROMPTS.forEach((prompt: SuggestionPrompt) => { // Specify type for prompt
-            const buttonContainer = quickButtonsSection.createDiv();
+            const buttonContainer = quickButtonsSection.createDiv({ cls: 'quick-button-container' });
             const button = new ButtonComponent(buttonContainer)
                 .setClass('quick-button')
+                .setClass('mod-cta')  // Add Obsidian's native button class
                 .setButtonText(prompt.type.toUpperCase())
                 .onClick(() => {
                     this.result.instructions = prompt.prompt;
@@ -58,15 +59,15 @@ export class RevisionModal extends Modal {
                     this.close();
                 });
 
-            // Set button style
-            button.buttonEl.style.backgroundColor = prompt.color;
-            button.buttonEl.style.color = 'white';
+            // Set button style using CSS variables
+            button.buttonEl.style.setProperty('--background-modifier-success', prompt.color);
             
-            // Add icon
-            button.buttonEl.createSpan({
+            // Add icon with proper spacing
+            const iconSpan = button.buttonEl.createSpan({
                 cls: 'quick-button-icon',
                 text: prompt.icon
             });
+            button.buttonEl.insertBefore(iconSpan, button.buttonEl.firstChild);
         });
 
         // Instructions input

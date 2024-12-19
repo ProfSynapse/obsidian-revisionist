@@ -80,44 +80,33 @@
     max-width: 900px; /* Slightly reduced from 1200px */
 }
 
+.quick-buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin: 16px 0;
+    padding: 0 8px;
+}
+
+.quick-button-container {
+    margin: 0;
+}
+
 .quick-button {
-    flex: 0 1 250px; /* Wider buttons */
+    width: 100%;
+    padding: 8px;
     display: flex;
-    flex-direction: row; /* Keep icon and text in a row */
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 16px 24px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s ease;
-    text-align: center;
-    min-width: 0;
-    font-size: 1em;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
-}
-
-.quick-button:hover {
-    filter: brightness(1.1);
 }
 
 .quick-button-icon {
-    font-size: 1.2em;
-    display: block; /* Make icon its own line */
-    margin-bottom: 4px;
+    margin-right: 4px;
 }
 
-.button-container {
-    display: flex;
-    justify-content: flex-end; /* Right align */
-    gap: 8px;
-    margin: 24px 16px 16px;
-    padding-right: 8px;
-}
-
-.button-container button {
-    min-width: 80px;
+.revision-instructions {
+    margin: 16px 0;
 }
 
 .revision-instructions textarea {

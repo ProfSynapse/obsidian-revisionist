@@ -20,6 +20,7 @@ export class LMStudioAdapter extends BaseAdapter {
         maxTokens: number;
         rawResponse?: boolean;
         selectedText?: string;  // Add this parameter
+        fullNoteContent: string;  // Add this parameter
     }): Promise<RequestUrlResponse> {
         return await requestUrl({
             url: `http://localhost:${this.port}/v1/chat/completions`,
@@ -38,7 +39,8 @@ export class LMStudioAdapter extends BaseAdapter {
                         role: 'user',
                         content: CONFIG.PROMPTS.formatUserPrompt(
                             params.prompt,
-                            params.selectedText || ''  // Pass selected text
+                            params.selectedText || '',  // Pass selected text
+                            params.fullNoteContent  // Include full note content
                         )
                     }
                 ],

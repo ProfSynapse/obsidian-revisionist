@@ -17,9 +17,55 @@ export const CONFIG = {
          * Format for user prompts
          * @param instructions - User's specific revision instructions
          * @param selectedText - The text selected by the user for revision
+         * @param fullNote - The full content of the note
          * @returns Formatted user prompt
          */
-        formatUserPrompt: (instructions: string, selectedText: string) => 
-            `Revise the following text based on these instructions: ${instructions}\n\nText to revise:\n${selectedText}`
-    }
+        formatUserPrompt: (instructions: string, selectedText: string, fullNote: string) => 
+            `
+Revise the following text based on the following
+
+## Full Document
+${fullNote}
+
+## Text to revise
+${selectedText}
+
+## Instructions
+${instructions}
+`
+    },
+
+    SUGGESTION_PROMPTS: [
+        {
+            type: 'clarify',
+            prompt: 'Improve the clarity of the text while maintaining its original meaning.',
+            icon: '💡',
+            color: '#4caf50' // green
+        },
+        {
+            type: 'trim',
+            prompt: 'Make the text more concise without losing key information.',
+            icon: '✂️',
+            color: '#2196f3' // blue
+        },
+        {
+            type: 'expand',
+            prompt: 'Expand the text to provide more detailed information.',
+            icon: '🔍',
+            color: '#ff9800' // orange
+        },
+        {
+            type: 'fix',
+            prompt: 'Fix any grammatical errors and improve the overall writing quality.',
+            icon: '📖',
+            color: '#9c27b0' // purple
+        }
+    ]
 };
+
+export interface SuggestionPrompt {
+    type: 'clarify' | 'trim' | 'expand' | 'fix';
+    prompt: string;
+    icon: string;
+    color: string;
+}

@@ -117,11 +117,8 @@ export abstract class BaseAdapter {
     public async testConnection(): Promise<boolean> {
         try {
             if (!this.isReady()) {
-                console.log('Adapter not ready during test connection');
                 return false;
             }
-
-            console.log('Testing connection with model:', this.models[0]?.apiName);
             
             const response = await this.makeApiRequest({
                 model: this.models[0]?.apiName || '',
@@ -130,11 +127,6 @@ export abstract class BaseAdapter {
                 maxTokens: 10,
                 rawResponse: true,
                 isTest: true
-            });
-
-            console.log('Test connection response:', {
-                status: response.status,
-                hasContent: !!response.json?.choices?.[0]?.message?.content
             });
 
             return response.status === 200 && !!response.json?.choices?.[0]?.message?.content;
@@ -148,16 +140,13 @@ export abstract class BaseAdapter {
      */
     protected handleError(error: unknown): APIResponse<string> {
         const provider = this.getProviderType();
-        console.error(`Error in ${provider} API call:`, error);
         
         let errorMessage = 'Unknown error occurred';
         if (error instanceof Error) {
             errorMessage = error.message;
-            console.error('Error stack:', error.stack);
         }
         
         if ('response' in (error as any)) {
-            console.error('API Response:', (error as any).response);
         }
 
         new Notice(`${provider} API Error: ${errorMessage}`);
@@ -213,13 +202,6 @@ export abstract class BaseAdapter {
      */
     public isReady(): boolean {
         const ready = (!!this.apiKey || this.getProviderType() === AIProvider.LMStudio) && this.models.length > 0;
-        if (!ready) {
-            console.warn(`${this.getProviderType()} adapter not ready:`, {
-                hasApiKey: !!this.apiKey,
-                provider: this.getProviderType(),
-                modelsCount: this.models.length
-            });
-        }
         return ready;
     }
 

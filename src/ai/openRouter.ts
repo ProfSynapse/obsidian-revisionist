@@ -22,13 +22,6 @@ export class OpenRouterAdapter extends BaseAdapter {
         selectedText?: string;
         isTest?: boolean;  // Add this parameter
     }): Promise<RequestUrlResponse> {
-        console.log('Making OpenRouter API request:', {
-            model: params.model,
-            temperature: params.temperature,
-            maxTokens: params.maxTokens,
-            isTest: params.isTest
-        });
-
         try {
             const messages = params.isTest ? 
                 [{ role: 'user', content: params.prompt }] :
@@ -64,24 +57,8 @@ export class OpenRouterAdapter extends BaseAdapter {
                 })
             });
 
-            console.log('OpenRouter API response:', {
-                status: response.status,
-                statusText: response.status === 200 ? 'OK' : response.text,
-                hasChoices: !!response.json?.choices?.length,
-                usage: response.json?.usage
-            });
-
             return response;
         } catch (error) {
-            console.error('OpenRouter API request failed:', error);
-            console.error('Request details:', {
-                model: params.model,
-                headers: {
-                    'Authorization': this.apiKey ? 'Set' : 'Not set',
-                    'HTTP-Referer': CONFIG.REFERRER,
-                    'X-Title': CONFIG.APP_NAME
-                }
-            });
             throw error;
         }
     }

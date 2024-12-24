@@ -73,7 +73,7 @@ export class RevisionModal extends Modal {
         // Instructions input
         const instructionsSection = contentEl.createDiv({ cls: 'revision-instructions' });
         new Setting(instructionsSection)
-            .setName('Revision Instructions')
+            .setName('Revision instructions')
             .setDesc('How would you like the text to be revised?')
             .addTextArea(text => {
                 this.instructionsEl = text;
@@ -89,7 +89,7 @@ export class RevisionModal extends Modal {
         const settings = this.settingsService.getSettings();
         if (settings.provider === AIProvider.OpenRouter) {
             new Setting(contentEl)
-                .setName('AI Model')
+                .setName('AI model')
                 .setDesc('Select the model to use for revision')
                 .addDropdown(dropdown => {
                     this.modelDropdown = dropdown;

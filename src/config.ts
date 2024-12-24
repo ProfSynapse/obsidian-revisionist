@@ -5,7 +5,7 @@
  */
 export const CONFIG = {
     REFERRER: 'https://www.synapticlabs.ai',
-    APP_NAME: 'Obsidian AI Revision Plugin',
+    APP_NAME: 'Revisionist',
     
     PROMPTS: {
         /**

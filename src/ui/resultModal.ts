@@ -29,11 +29,11 @@ export class ResultModal extends Modal {
         contentEl.addClass('result-modal');
 
         // Modal title
-        contentEl.createEl('h2', { text: 'Review Revised Text' });
+        contentEl.createEl('h2', { text: 'Review revised text' });
         
         // Create container for revised text
         const revisedSection = contentEl.createDiv({ cls: 'text-section' });
-        revisedSection.createEl('h3', { text: 'Revised Text' });
+        revisedSection.createEl('h3', { text: 'Revised text' });
         
         // Create editable textarea for revised text
         this.revisedTextArea = new TextAreaComponent(revisedSection);
@@ -59,7 +59,7 @@ export class ResultModal extends Modal {
         });
 
         // Copy button
-        const copyButton = this.createButton(buttonContainer, 'Copy to Clipboard', '', () => {
+        const copyButton = this.createButton(buttonContainer, 'Copy to clipboard', '', () => {
             this.copyToClipboard();
         });
 

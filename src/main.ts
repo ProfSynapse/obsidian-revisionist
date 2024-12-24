@@ -36,7 +36,7 @@ export default class AIRevisionPlugin extends Plugin {
         ));
 
         // Add ribbon icon for mobile-friendly access
-        this.addRibbonIcon('wand-2', 'Revise Selected Text', () => {
+        this.addRibbonIcon('wand-2', 'Revise selected text', () => {
             const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
             if (activeView?.editor) {
                 const selectedText = activeView.editor.getSelection();
@@ -51,7 +51,7 @@ export default class AIRevisionPlugin extends Plugin {
         // Add command to command palette
         this.addCommand({
             id: 'revise-text',
-            name: 'Revise Selected Text',
+            name: 'Revise selected text',
             editorCallback: (editor: Editor) => {
                 this.handleRevisionRequest(editor);
             }

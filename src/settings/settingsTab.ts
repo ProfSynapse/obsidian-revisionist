@@ -18,8 +18,7 @@ export class SettingTab extends PluginSettingTab {
         const { containerEl } = this;
         containerEl.empty();
 
-        containerEl.createEl('h2', { text: 'Revisionist' });
-
+        // Remove the top-level heading
         this.addProviderSelection(containerEl);
         this.addProviderSpecificSettings(containerEl);
         this.addDefaultSettings(containerEl);
@@ -29,7 +28,7 @@ export class SettingTab extends PluginSettingTab {
         const settings = this.settingsService.getSettings();
 
         new Setting(containerEl)
-            .setName('AI Provider')
+            .setName('AI provider')
             .setDesc('Select which AI provider to use')
             .addDropdown(dropdown => {
                 Object.values(AIProvider).forEach(provider => {
@@ -70,7 +69,7 @@ export class SettingTab extends PluginSettingTab {
         } catch (error) {
             new Notice(`Connection test error: ${error.message}`);
         } finally {
-            button.setButtonText('Test Connection');
+            button.setButtonText('Test connection');
             button.setDisabled(false);
         }
     }
@@ -80,7 +79,7 @@ export class SettingTab extends PluginSettingTab {
 
         // API Key Setting
         new Setting(containerEl)
-            .setName('OpenRouter API Key')
+            .setName('OpenRouter API key')
             .setDesc('Enter your OpenRouter API key')
             .addText(text => {
                 text
@@ -106,7 +105,7 @@ export class SettingTab extends PluginSettingTab {
         new Setting(containerEl)
             .addButton(button => {
                 button
-                    .setButtonText('Test Connection')
+                    .setButtonText('Test connection')
                     .onClick(async () => {
                         await this.handleTestConnection(button);
                     });
@@ -118,7 +117,7 @@ export class SettingTab extends PluginSettingTab {
 
         // Port Setting
         new Setting(containerEl)
-            .setName('LM Studio Port')
+            .setName('LM Studio port')
             .setDesc('Enter the port number for your local LM Studio instance')
             .addText(text => {
                 text
@@ -134,7 +133,7 @@ export class SettingTab extends PluginSettingTab {
 
         // Model Name Setting
         new Setting(containerEl)
-            .setName('Model Name')
+            .setName('Model name')
             .setDesc('Enter the name of your local model')
             .addText(text => {
                 text
@@ -152,7 +151,7 @@ export class SettingTab extends PluginSettingTab {
         new Setting(containerEl)
             .addButton(button => {
                 button
-                    .setButtonText('Test Connection')
+                    .setButtonText('Test connection')
                     .onClick(async () => {
                         await this.handleTestConnection(button);
                     });
@@ -165,7 +164,7 @@ export class SettingTab extends PluginSettingTab {
         // Default Model Selection (for OpenRouter)
         if (settings.provider === AIProvider.OpenRouter) {
             new Setting(containerEl)
-                .setName('Default Model')
+                .setName('Default model')
                 .setDesc('Select the default model to use')
                 .addDropdown(dropdown => {
                     const models = AIModelMap[AIProvider.OpenRouter];
@@ -183,7 +182,7 @@ export class SettingTab extends PluginSettingTab {
 
         // Default Temperature Setting
         new Setting(containerEl)
-            .setName('Default Temperature')
+            .setName('Default temperature')
             .setDesc('Set the default temperature for the AI model (0.0 - 1.0)')
             .addSlider(slider => {
                 slider

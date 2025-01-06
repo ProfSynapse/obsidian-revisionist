@@ -1,7 +1,7 @@
 {
     "id": "revisionist",
-    "name": "Revisionist",
-    "version": "0.1.0",
+    "name": "AI Revisionist",
+    "version": "0.1.1",
     "minAppVersion": "1.7.2",
     "description": "AI-powered text revision for your notes.",
     "author": "Synaptic Labs",

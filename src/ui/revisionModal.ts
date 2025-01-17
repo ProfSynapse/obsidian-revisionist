@@ -43,7 +43,7 @@ export class RevisionModal extends Modal {
         const { contentEl } = this;
 
         // Modal title
-        contentEl.createEl('h2', { text: 'Revise Text' });
+        contentEl.createEl('h2', { text: 'Revise text' });
 
         // Quick prompt buttons
         const quickButtonsSection = contentEl.createDiv({ cls: 'quick-buttons-grid' });
@@ -52,7 +52,7 @@ export class RevisionModal extends Modal {
             const button = new ButtonComponent(buttonContainer)
                 .setClass('quick-button')
                 .setClass('mod-cta')  // Add Obsidian's native button class
-                .setButtonText(prompt.type.toUpperCase())
+                .setButtonText(prompt.type.charAt(0).toUpperCase() + prompt.type.slice(1))
                 .onClick(() => {
                     this.result.instructions = prompt.prompt;
                     this.onSubmit(this.result);

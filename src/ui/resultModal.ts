@@ -46,7 +46,7 @@ export class ResultModal extends Modal {
         if (this.props.cost) {
             const costInfo = contentEl.createDiv({ cls: 'cost-info' });
             costInfo.createEl('span', { 
-                text: `Cost: $${this.props.cost.total.toFixed(4)} (Input: $${this.props.cost.input.toFixed(4)}, Output: $${this.props.cost.output.toFixed(4)})` 
+                text: `cost: $${this.props.cost.total.toFixed(4)} (input: $${this.props.cost.input.toFixed(4)}, output: $${this.props.cost.output.toFixed(4)})` 
             });
         }
 

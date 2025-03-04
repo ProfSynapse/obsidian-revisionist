@@ -94,8 +94,21 @@ export const AIModelMap: Record<AIProvider, AIModel[]> = {
             contextWindow: 200000
         },
         {
-            name: 'Google Gemini Flash 1.5',
-            apiName: 'google/gemini-flash-1.5',
+            name: 'Anthropic Claude 3.7 Sonnet',
+            apiName: 'anthropic/claude-3.7-sonnet',
+            capabilities: {
+                maxTokens: 8192,
+                supportsFunctions: true,
+                supportsStreaming: true,
+                supportsVision: true
+            },
+            inputCostPer1M: 3.00,
+            outputCostPer1M: 15.00,
+            contextWindow: 200000
+        },
+        {
+            name: 'Google Gemini 2.0 Flash Lite',
+            apiName: 'google/gemini-2.0-flash-lite-001',
             capabilities: {
                 maxTokens: 8192,
                 supportsStreaming: true
@@ -105,14 +118,14 @@ export const AIModelMap: Record<AIProvider, AIModel[]> = {
             contextWindow: 1000000
         },
         {
-            name: 'Google Gemini Flash 1.5 8B',
-            apiName: 'google/gemini-flash-1.5-8b',
+            name: 'Google Gemini Flash 2.0',
+            apiName: 'google/gemini-2.0-flash-001',
             capabilities: {
                 maxTokens: 8192,
                 supportsStreaming: true
             },
-            inputCostPer1M: 0.0375,
-            outputCostPer1M: 0.15,
+            inputCostPer1M: 0.1,
+            outputCostPer1M: 0.4,
             contextWindow: 1000000
         },
         {
@@ -176,8 +189,8 @@ export const AIModelMap: Record<AIProvider, AIModel[]> = {
             contextWindow: 128000
         },
         {
-            name: 'OpenAI o1 Preview',
-            apiName: 'openai/gpt-o1-preview',
+            name: 'OpenAI o1',
+            apiName: 'openai/o1',
             capabilities: {
                 maxTokens: 33000,
                 supportsFunctions: true,

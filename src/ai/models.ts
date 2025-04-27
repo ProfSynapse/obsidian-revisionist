@@ -5,7 +5,8 @@
  */
 export enum AIProvider {
     OpenRouter = 'openrouter',
-    LMStudio = 'lmstudio'
+    LMStudio = 'lmstudio',
+    OpenAI = 'openai'
 }
 
 /**
@@ -195,6 +196,70 @@ export const AIModelMap: Record<AIProvider, AIModel[]> = {
             capabilities: {
                 supportsStreaming: false
             }
+        }
+    ],
+    [AIProvider.OpenAI]: [
+        {
+            name: 'GPT-4o',
+            apiName: 'gpt-4o',
+            capabilities: {
+                maxTokens: 4096,
+                supportsFunctions: true,
+                supportsStreaming: true,
+                supportsVision: true
+            },
+            inputCostPer1M: 10.00,
+            outputCostPer1M: 30.00,
+            contextWindow: 128000
+        },
+        {
+            name: 'GPT-4o-mini',
+            apiName: 'gpt-4o-mini',
+            capabilities: {
+                maxTokens: 4096,
+                supportsFunctions: true,
+                supportsStreaming: true
+            },
+            inputCostPer1M: 0.50,
+            outputCostPer1M: 1.50,
+            contextWindow: 128000
+        },
+        {
+            name: 'GPT-4.1',
+            apiName: 'gpt-4.1-2025-04-14',
+            capabilities: {
+                maxTokens: 4096,
+                supportsFunctions: true,
+                supportsStreaming: true,
+                supportsVision: true
+            },
+            inputCostPer1M: 2.00,
+            outputCostPer1M: 8.00,
+            contextWindow: 1000000
+        },
+        {
+            name: 'GPT-4.1-mini',
+            apiName: 'gpt-4.1-mini-2025-04-14',
+            capabilities: {
+                maxTokens: 4096,
+                supportsFunctions: true,
+                supportsStreaming: true
+            },
+            inputCostPer1M: 0.40,
+            outputCostPer1M: 1.60,
+            contextWindow: 1000000
+        },
+        {
+            name: 'GPT-4.1-nano',
+            apiName: 'gpt-4.1-nano-2025-04-14',
+            capabilities: {
+                maxTokens: 4096,
+                supportsFunctions: true,
+                supportsStreaming: true
+            },
+            inputCostPer1M: 0.10,
+            outputCostPer1M: 0.40,
+            contextWindow: 1000000
         }
     ]
 };

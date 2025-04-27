@@ -24,7 +24,8 @@ export const DEFAULT_SETTINGS: PluginSettings = {
     provider: AIProvider.OpenRouter,
     apiKeys: {
         [AIProvider.OpenRouter]: '',
-        [AIProvider.LMStudio]: ''  // LMStudio doesn't use API keys
+        [AIProvider.LMStudio]: '',  // LMStudio doesn't use API keys
+        [AIProvider.OpenAI]: ''     // OpenAI API key
     },
     defaultModel: 'anthropic/claude-3.5-sonnet',  // Default to Claude
     defaultTemperature: 0.7,

@@ -52,6 +52,8 @@ export class SettingTab extends PluginSettingTab {
             this.addOpenRouterSettings(containerEl);
         } else if (settings.provider === AIProvider.LMStudio) {
             this.addLMStudioSettings(containerEl);
+        } else if (settings.provider === AIProvider.OpenAI) {
+            this.addOpenAISettings(containerEl);
         }
     }
 
@@ -161,13 +163,13 @@ export class SettingTab extends PluginSettingTab {
     private addDefaultSettings(containerEl: HTMLElement): void {
         const settings = this.settingsService.getSettings();
 
-        // Default Model Selection (for OpenRouter)
-        if (settings.provider === AIProvider.OpenRouter) {
+        // Default Model Selection (for OpenRouter and OpenAI)
+        if (settings.provider === AIProvider.OpenRouter || settings.provider === AIProvider.OpenAI) {
             new Setting(containerEl)
                 .setName('Default model')
                 .setDesc('Select the default model to use')
                 .addDropdown(dropdown => {
-                    const models = AIModelMap[AIProvider.OpenRouter];
+                    const models = AIModelMap[settings.provider];
                     models.forEach(model => {
                         dropdown.addOption(model.apiName, model.name);
                     });
@@ -195,10 +197,49 @@ export class SettingTab extends PluginSettingTab {
             });
     }
 
+    private addOpenAISettings(containerEl: HTMLElement): void {
+        const settings = this.settingsService.getSettings();
+
+        // API Key Setting
+        new Setting(containerEl)
+            .setName('OpenAI API key')
+            .setDesc('Enter your OpenAI API key')
+            .addText(text => {
+                text
+                    .setPlaceholder('Enter API key')
+                    .setValue(settings.apiKeys[AIProvider.OpenAI])
+                    .onChange(async (value) => {
+                        await this.settingsService.setApiKey(AIProvider.OpenAI, value);
+                        // Immediately update the adapter with new key
+                        this.plugin.updateAdapterConfig();
+                    });
+                text.inputEl.type = 'password';
+            })
+            .addExtraButton(button => {
+                button
+                    .setIcon('external-link')
+                    .setTooltip('Get API key')
+                    .onClick(() => {
+                        window.open('https://platform.openai.com/api-keys');
+                    });
+            });
+
+        // Add test connection button
+        new Setting(containerEl)
+            .addButton(button => {
+                button
+                    .setButtonText('Test connection')
+                    .onClick(async () => {
+                        await this.handleTestConnection(button);
+                    });
+            });
+    }
+
     private getProviderDisplayName(provider: AIProvider): string {
         const displayNames: Record<AIProvider, string> = {
             [AIProvider.OpenRouter]: 'OpenRouter',
-            [AIProvider.LMStudio]: 'LM Studio (Local)'
+            [AIProvider.LMStudio]: 'LM Studio (Local)',
+            [AIProvider.OpenAI]: 'OpenAI'
         };
         return displayNames[provider] || provider;
     }

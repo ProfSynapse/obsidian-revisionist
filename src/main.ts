@@ -13,6 +13,7 @@ import { RevisionModal } from './ui/revisionModal';
 import { ResultModal } from './ui/resultModal';
 import { OpenRouterAdapter } from './ai/openRouter';
 import { LMStudioAdapter } from './ai/lmStudio';
+import { OpenAIAdapter } from './ai/openAI';
 import { BaseAdapter } from './ai/baseAdapter';
 import { AIProvider, AIModelUtils } from './ai/models';
 
@@ -104,6 +105,12 @@ export default class AIRevisionPlugin extends Plugin {
                         modelName: settings.lmStudio.modelName
                     });
                     break;
+                case AIProvider.OpenAI:
+                    this.aiAdapter = new OpenAIAdapter();
+                    if (!settings.apiKeys[AIProvider.OpenAI]) {
+                    }
+                    this.aiAdapter.setApiKey(settings.apiKeys[AIProvider.OpenAI]);
+                    break;
                 default:
                     return;
             }
@@ -130,6 +137,8 @@ export default class AIRevisionPlugin extends Plugin {
                 port: settings.lmStudio.port,
                 modelName: settings.lmStudio.modelName
             });
+        } else if (settings.provider === AIProvider.OpenAI) {
+            this.aiAdapter.setApiKey(settings.apiKeys[AIProvider.OpenAI]);
         }
     }
 

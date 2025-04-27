@@ -85,15 +85,15 @@ export class RevisionModal extends Modal {
                 text.inputEl.rows = 4;
             });
 
-        // Model selection (only for OpenRouter)
+        // Model selection (for OpenRouter and OpenAI)
         const settings = this.settingsService.getSettings();
-        if (settings.provider === AIProvider.OpenRouter) {
+        if (settings.provider === AIProvider.OpenRouter || settings.provider === AIProvider.OpenAI) {
             new Setting(contentEl)
                 .setName('AI model')
                 .setDesc('Select the model to use for revision')
                 .addDropdown(dropdown => {
                     this.modelDropdown = dropdown;
-                    const models = AIModelMap[AIProvider.OpenRouter];
+                    const models = AIModelMap[settings.provider];
                     models.forEach(model => {
                         dropdown.addOption(model.apiName, model.name);
                     });

@@ -19,8 +19,9 @@ export class LMStudioAdapter extends BaseAdapter {
         temperature: number;
         maxTokens: number;
         rawResponse?: boolean;
-        selectedText?: string;  // Add this parameter
-        fullNoteContent: string;  // Add this parameter
+        selectedText?: string;
+        fullNote?: string;
+        isTest?: boolean;
     }): Promise<RequestUrlResponse> {
         return await requestUrl({
             url: `http://localhost:${this.port}/v1/chat/completions`,
@@ -39,8 +40,8 @@ export class LMStudioAdapter extends BaseAdapter {
                         role: 'user',
                         content: CONFIG.PROMPTS.formatUserPrompt(
                             params.prompt,
-                            params.selectedText || '',  // Pass selected text
-                            params.fullNoteContent  // Include full note content
+                            params.selectedText || '',
+                            params.fullNote || ''
                         )
                     }
                 ],

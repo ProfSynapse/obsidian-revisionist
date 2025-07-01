@@ -135,7 +135,7 @@ export class OpenAIAdapter extends BaseAdapter {
                     type: error.type,
                     code: error.code,
                     param: error.param,
-                    request_id: error.request_id
+                    request_id: error.requestID
                 });
             }
             
@@ -286,33 +286,23 @@ export class OpenAIAdapter extends BaseAdapter {
      */
     public async testConnection(): Promise<boolean> {
         try {
-            console.log('Testing OpenAI connection...');
-            
             if (!this.isReady()) {
-                console.log('OpenAI adapter not ready - missing API key or models');
                 return false;
             }
             
-            // Use gpt-4.1-nano-2025-04-14 for testing as it's definitely supported by the new API
-            // and is the most cost-effective model for testing
             const testModel = 'gpt-4.1-nano-2025-04-14';
-            console.log('Using test model:', testModel);
-            
             const client = this.ensureClient();
             
-            // Use the SDK to make a simple request
             const response = await client.responses.create({
                 model: testModel,
                 input: 'Hi',
                 max_output_tokens: 25
             });
             
-            console.log('Test connection successful, response ID:', response.id);
             return true;
         } catch (error) {
             console.error('OpenAI connection test error:', error);
             
-            // Provide more detailed error information from the SDK
             if (error instanceof OpenAI.APIError) {
                 console.error('OpenAI API Error Details:', {
                     status: error.status,
@@ -320,7 +310,7 @@ export class OpenAIAdapter extends BaseAdapter {
                     type: error.type,
                     code: error.code,
                     param: error.param,
-                    request_id: error.request_id
+                    request_id: error.requestID
                 });
             }
             

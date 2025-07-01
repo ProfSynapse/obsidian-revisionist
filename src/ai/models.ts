@@ -82,8 +82,8 @@ export const AIModelMap: Record<AIProvider, AIModel[]> = {
             contextWindow: 200000
         },
         {
-            name: 'Anthropic Claude 3.5 Sonnet',
-            apiName: 'anthropic/claude-3.5-sonnet',
+            name: 'Anthropic Claude 4 Sonnet',
+            apiName: 'anthropic/claude-4-sonnet',
             capabilities: {
                 maxTokens: 8192,
                 supportsFunctions: true,
@@ -95,51 +95,27 @@ export const AIModelMap: Record<AIProvider, AIModel[]> = {
             contextWindow: 200000
         },
         {
-            name: 'Anthropic Claude 3.7 Sonnet',
-            apiName: 'anthropic/claude-3.7-sonnet',
+            name: 'Google Gemini Flash 2.5',
+            apiName: 'google/gemini-2.5-flash',
             capabilities: {
-                maxTokens: 8192,
-                supportsFunctions: true,
-                supportsStreaming: true,
-                supportsVision: true
-            },
-            inputCostPer1M: 3.00,
-            outputCostPer1M: 15.00,
-            contextWindow: 200000
-        },
-        {
-            name: 'Google Gemini 2.0 Flash Lite',
-            apiName: 'google/gemini-2.0-flash-lite-001',
-            capabilities: {
-                maxTokens: 8192,
+                maxTokens: 66000,
                 supportsStreaming: true
             },
-            inputCostPer1M: 0.075,
-            outputCostPer1M: 0.30,
-            contextWindow: 1000000
+            inputCostPer1M: 0.3,
+            outputCostPer1M: 2.5,
+            contextWindow: 1048576
         },
         {
-            name: 'Google Gemini Flash 2.0',
-            apiName: 'google/gemini-2.0-flash-001',
-            capabilities: {
-                maxTokens: 8192,
-                supportsStreaming: true
-            },
-            inputCostPer1M: 0.1,
-            outputCostPer1M: 0.4,
-            contextWindow: 1000000
-        },
-        {
-            name: 'Google Gemini Pro 1.5',
-            apiName: 'google/gemini-pro-1.5',
+            name: 'Google Gemini Pro 2.5',
+            apiName: 'google/gemini-2.5-pro',
             capabilities: {
                 maxTokens: 8192,
                 supportsStreaming: true,
                 supportsVision: true
             },
             inputCostPer1M: 1.25,
-            outputCostPer1M: 5.00,
-            contextWindow: 2000000
+            outputCostPer1M: 10.00,
+            contextWindow: 1048576
         },
         {
             name: 'Mistral Large',
@@ -153,53 +129,41 @@ export const AIModelMap: Record<AIProvider, AIModel[]> = {
             contextWindow: 128000
         },
         {
-            name: 'OpenAI 4o',
-            apiName: 'openai/gpt-4o-2024-11-20',
+            name: 'OpenAI 4.1',
+            apiName: 'openai/gpt-4.1',
             capabilities: {
-                maxTokens: 16000,
+                maxTokens: 33000,
                 supportsFunctions: true,
                 supportsStreaming: true,
                 supportsVision: true
             },
-            inputCostPer1M: 2.50,
-            outputCostPer1M: 10.00,
-            contextWindow: 128000
+            inputCostPer1M: 2.00,
+            outputCostPer1M: 8.00,
+            contextWindow: 1047576
         },
         {
-            name: 'OpenAI 4o Mini',
-            apiName: 'openai/gpt-4o-mini',
-            capabilities: {
-                maxTokens: 16000,
-                supportsFunctions: true,
-                supportsStreaming: true
-            },
-            inputCostPer1M: 0.15,
-            outputCostPer1M: 0.60,
-            contextWindow: 128000
-        },
-        {
-            name: 'OpenAI o1 Mini',
-            apiName: 'openai/gpt-o1-mini',
-            capabilities: {
-                maxTokens: 66000,
-                supportsFunctions: true,
-                supportsStreaming: true
-            },
-            inputCostPer1M: 3.00,
-            outputCostPer1M: 12.00,
-            contextWindow: 128000
-        },
-        {
-            name: 'OpenAI o1',
-            apiName: 'openai/o1',
+            name: 'OpenAI 4.1 Mini',
+            apiName: 'openai/gpt-4.1-mini',
             capabilities: {
                 maxTokens: 33000,
                 supportsFunctions: true,
                 supportsStreaming: true
             },
-            inputCostPer1M: 15.00,
-            outputCostPer1M: 60.00,
-            contextWindow: 128000
+            inputCostPer1M: 0.4,
+            outputCostPer1M: 1.60,
+            contextWindow: 1047576
+        },
+        {
+            name: 'OpenAI o4 Mini',
+            apiName: 'openai/gpt-o1-mini',
+            capabilities: {
+                maxTokens: 100000,
+                supportsFunctions: true,
+                supportsStreaming: true
+            },
+            inputCostPer1M: 1.10,
+            outputCostPer1M: 4.40,
+            contextWindow: 200000
         }
     ],
     [AIProvider.LMStudio]: [

@@ -11,11 +11,12 @@ import { SettingsService } from './settings/settings';
 import { SettingTab } from './settings/settingsTab';
 import { RevisionModal } from './ui/revisionModal';
 import { ResultModal } from './ui/resultModal';
-import { OpenRouterAdapter } from './ai/openRouter';
-import { LMStudioAdapter } from './ai/lmStudio';
-import { OpenAIAdapter } from './ai/openAI';
-import { BaseAdapter } from './ai/baseAdapter';
-import { AIProvider, AIModelUtils } from './ai/models';
+import { createAdapter } from './llm-adapter-kit/adapters';
+import { SupportedProvider, LLMResponse, GenerateOptions } from './llm-adapter-kit/adapters/types';
+import { ModelRegistry } from './llm-adapter-kit/adapters/ModelRegistry';
+import { ModelSpec } from './llm-adapter-kit/adapters/modelTypes';
+import { BaseAdapter } from './llm-adapter-kit/adapters/BaseAdapter';
+import { AIProvider } from './settings/settings';
 
 export default class AIRevisionPlugin extends Plugin {
     private settingsService: SettingsService;
@@ -91,31 +92,26 @@ export default class AIRevisionPlugin extends Plugin {
 
         try {
             // Create new adapter based on provider
-            switch (settings.provider) {
-                case AIProvider.OpenRouter:
-                    this.aiAdapter = new OpenRouterAdapter();
-                    if (!settings.apiKeys[AIProvider.OpenRouter]) {
-                    }
-                    this.aiAdapter.setApiKey(settings.apiKeys[AIProvider.OpenRouter]);
-                    break;
-                case AIProvider.LMStudio:
-                    this.aiAdapter = new LMStudioAdapter();
-                    this.aiAdapter.configure({
-                        port: settings.lmStudio.port,
-                        modelName: settings.lmStudio.modelName
-                    });
-                    break;
-                case AIProvider.OpenAI:
-                    this.aiAdapter = new OpenAIAdapter();
-                    if (!settings.apiKeys[AIProvider.OpenAI]) {
-                    }
-                    this.aiAdapter.setApiKey(settings.apiKeys[AIProvider.OpenAI]);
-                    break;
-                default:
-                    return;
+            const providerName = settings.provider.toLowerCase() as SupportedProvider;
+            this.aiAdapter = createAdapter(providerName, settings.defaultModel);
+            
+            // Configure the adapter with API key if needed
+            if (settings.apiKeys[settings.provider]) {
+                // Set API key in environment for the adapter to pick up
+                this.configureAdapter(settings.provider as AIProvider, settings.apiKeys[settings.provider]);
             }
         } catch (error) {
             new Notice('Failed to initialize AI provider. Check console for details.');
+        }
+    }
+
+    /**
+     * Configure adapter with API key
+     */
+    private configureAdapter(provider: AIProvider, apiKey: string) {
+        // Set API key in the adapter's config
+        if (this.aiAdapter && 'apiKey' in this.aiAdapter) {
+            (this.aiAdapter as any).apiKey = apiKey;
         }
     }
 
@@ -130,15 +126,21 @@ export default class AIRevisionPlugin extends Plugin {
             return;
         }
 
-        if (settings.provider === AIProvider.OpenRouter) {
-            this.aiAdapter.setApiKey(settings.apiKeys[AIProvider.OpenRouter]);
-        } else if (settings.provider === AIProvider.LMStudio) {
-            this.aiAdapter.configure({
-                port: settings.lmStudio.port,
-                modelName: settings.lmStudio.modelName
-            });
-        } else if (settings.provider === AIProvider.OpenAI) {
-            this.aiAdapter.setApiKey(settings.apiKeys[AIProvider.OpenAI]);
+        // Update API key for current provider
+        if (settings.apiKeys[settings.provider]) {
+            this.configureAdapter(settings.provider as AIProvider, settings.apiKeys[settings.provider]);
+        }
+    }
+
+    /**
+     * Check if adapter is available
+     */
+    private async isAdapterReady(): Promise<boolean> {
+        if (!this.aiAdapter) return false;
+        try {
+            return await this.aiAdapter.isAvailable();
+        } catch (error) {
+            return false;
         }
     }
 
@@ -146,19 +148,27 @@ export default class AIRevisionPlugin extends Plugin {
      * Calculate approximate cost based on token usage and model rates
      */
     private calculateApproximateCost(tokens: { input: number; output: number }, modelName: string): { input: number; output: number; total: number } | undefined {
-        const model = AIModelUtils.getModelByApiName(modelName);
-        if (!model || !model.inputCostPer1M || !model.outputCostPer1M) {
+        try {
+            // Use ModelRegistry to get model info
+            const models = ModelRegistry.getLatestModels();
+            const model = models.find(m => m.apiName === modelName || m.name === modelName);
+            
+            if (!model) {
+                return undefined;
+            }
+
+            const inputCost = (tokens.input / 1_000_000) * model.inputCostPerMillion;
+            const outputCost = (tokens.output / 1_000_000) * model.outputCostPerMillion;
+            
+            return {
+                input: inputCost,
+                output: outputCost,
+                total: inputCost + outputCost
+            };
+        } catch (error) {
+            console.warn('Failed to calculate cost:', error);
             return undefined;
         }
-
-        const inputCost = (tokens.input / 1_000_000) * model.inputCostPer1M;
-        const outputCost = (tokens.output / 1_000_000) * model.outputCostPer1M;
-        
-        return {
-            input: inputCost,
-            output: outputCost,
-            total: inputCost + outputCost
-        };
     }
 
     /**
@@ -188,7 +198,7 @@ export default class AIRevisionPlugin extends Plugin {
         }
 
         // Check if adapter is ready
-        if (!this.aiAdapter.isReady()) {
+        if (!(await this.isAdapterReady())) {
             new Notice('AI provider is not properly configured. Please check settings.');
             return;
         }
@@ -203,24 +213,31 @@ export default class AIRevisionPlugin extends Plugin {
                 try {
                     new Notice('Generating revision...');
                     
-                    const response = await this.aiAdapter.generateResponse(
-                        result.instructions,
-                        result.model,
-                        {
-                            temperature: result.temperature,
-                            maxTokens: 4096,
-                            selectedText: selectedText,
-                            fullNote: fullNoteContent // Pass fullNote here
-                        }
-                    );
+                    // Create the prompt with context
+                    const contextualPrompt = `Based on the following note content and selected text, ${result.instructions}
 
-                    if (!response.success) {
-                        throw new Error(response.error || 'Failed to generate revision');
-                    }
+Full note content:
+${fullNoteContent}
+
+Selected text to revise:
+${selectedText}
+
+Please provide only the revised version of the selected text.`;
+
+                    const generateOptions: GenerateOptions = {
+                        model: result.model,
+                        temperature: result.temperature,
+                        maxTokens: 4096
+                    };
+
+                    const response: LLMResponse = await this.aiAdapter.generate(contextualPrompt, generateOptions);
 
                     // Calculate cost if tokens are available
-                    const cost = response.tokens ? 
-                        this.calculateApproximateCost(response.tokens, result.model) : 
+                    const cost = response.usage ? 
+                        this.calculateApproximateCost({
+                            input: response.usage.promptTokens,
+                            output: response.usage.completionTokens
+                        }, result.model) : 
                         undefined;
 
                     // Show result modal with cost
@@ -228,12 +245,12 @@ export default class AIRevisionPlugin extends Plugin {
                         this.app,
                         {
                             originalText: selectedText,
-                            revisedText: response.data as string,
+                            revisedText: response.text,
                             editor: editor,
                             onRetry: () => {
                                 this.handleRevisionRequest(editor);
                             },
-                            cost: cost  // Simply pass the cost object without the isApproximate flag
+                            cost: cost
                         }
                     ).open();
 
@@ -250,10 +267,7 @@ export default class AIRevisionPlugin extends Plugin {
      * Test the connection to the current AI provider
      */
     async testConnection(): Promise<boolean> {
-        if (!this.aiAdapter) {
-            return false;
-        }
-        return this.aiAdapter.testConnection();
+        return await this.isAdapterReady();
     }
 
     async onunload() {

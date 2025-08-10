@@ -1,6 +1,18 @@
-// src/sttings/settings.ts
+// src/settings/settings.ts
 
-import { AIProvider } from '../ai/models';
+import { SupportedProvider } from '../llm-adapter-kit/adapters/types';
+
+// Define available providers
+export enum AIProvider {
+    OpenRouter = 'openrouter',
+    OpenAI = 'openai',
+    Anthropic = 'anthropic',
+    Google = 'google',
+    Mistral = 'mistral',
+    Groq = 'groq',
+    Perplexity = 'perplexity',
+    Requesty = 'requesty'
+}
 
 /**
  * Plugin settings interface
@@ -24,8 +36,13 @@ export const DEFAULT_SETTINGS: PluginSettings = {
     provider: AIProvider.OpenRouter,
     apiKeys: {
         [AIProvider.OpenRouter]: '',
-        [AIProvider.LMStudio]: '',  // LMStudio doesn't use API keys
-        [AIProvider.OpenAI]: ''     // OpenAI API key
+        [AIProvider.OpenAI]: '',
+        [AIProvider.Anthropic]: '',
+        [AIProvider.Google]: '',
+        [AIProvider.Mistral]: '',
+        [AIProvider.Groq]: '',
+        [AIProvider.Perplexity]: '',
+        [AIProvider.Requesty]: ''
     },
     defaultModel: 'anthropic/claude-3.5-sonnet',  // Default to Claude
     defaultTemperature: 0.7,

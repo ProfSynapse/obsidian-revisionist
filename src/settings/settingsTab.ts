@@ -1,8 +1,10 @@
 // src/settings/settingsTab.ts
 
 import { App, PluginSettingTab, Setting, Notice } from 'obsidian';
-import { AIProvider, AIModelMap } from '../ai/models';
-import { SettingsService } from './settings';
+import { AIProvider, SettingsService } from './settings';
+import { ModelRegistry } from '../llm-adapter-kit/adapters/ModelRegistry';
+import { ModelSpec } from '../llm-adapter-kit/adapters/modelTypes';
+import { createAdapter } from '../llm-adapter-kit/adapters';
 
 export class SettingTab extends PluginSettingTab {
     private settingsService: SettingsService;
@@ -48,13 +50,18 @@ export class SettingTab extends PluginSettingTab {
     private addProviderSpecificSettings(containerEl: HTMLElement): void {
         const settings = this.settingsService.getSettings();
 
-        if (settings.provider === AIProvider.OpenRouter) {
-            this.addOpenRouterSettings(containerEl);
-        } else if (settings.provider === AIProvider.LMStudio) {
-            this.addLMStudioSettings(containerEl);
-        } else if (settings.provider === AIProvider.OpenAI) {
-            this.addOpenAISettings(containerEl);
-        }
+        // Add API key setting for all providers
+        this.addApiKeySettings(containerEl, settings.provider);
+        
+        // Add test connection button
+        new Setting(containerEl)
+            .addButton(button => {
+                button
+                    .setButtonText('Test connection')
+                    .onClick(async () => {
+                        await this.handleTestConnection(button);
+                    });
+            });
     }
 
     private async handleTestConnection(button: any) {
@@ -76,19 +83,20 @@ export class SettingTab extends PluginSettingTab {
         }
     }
 
-    private addOpenRouterSettings(containerEl: HTMLElement): void {
+    private addApiKeySettings(containerEl: HTMLElement, provider: AIProvider): void {
         const settings = this.settingsService.getSettings();
+        const providerInfo = this.getProviderInfo(provider);
 
         // API Key Setting
         new Setting(containerEl)
-            .setName('OpenRouter API key')
-            .setDesc('Enter your OpenRouter API key')
+            .setName(`${providerInfo.name} API key`)
+            .setDesc(`Enter your ${providerInfo.name} API key`)
             .addText(text => {
                 text
                     .setPlaceholder('Enter API key')
-                    .setValue(settings.apiKeys[AIProvider.OpenRouter])
+                    .setValue(settings.apiKeys[provider])
                     .onChange(async (value) => {
-                        await this.settingsService.setApiKey(AIProvider.OpenRouter, value);
+                        await this.settingsService.setApiKey(provider, value);
                         // Immediately update the adapter with new key
                         this.plugin.updateAdapterConfig();
                     });
@@ -99,77 +107,38 @@ export class SettingTab extends PluginSettingTab {
                     .setIcon('external-link')
                     .setTooltip('Get API key')
                     .onClick(() => {
-                        window.open('https://openrouter.ai/keys');
-                    });
-            });
-
-        // Add test connection button
-        new Setting(containerEl)
-            .addButton(button => {
-                button
-                    .setButtonText('Test connection')
-                    .onClick(async () => {
-                        await this.handleTestConnection(button);
+                        window.open(providerInfo.keyUrl);
                     });
             });
     }
 
-    private addLMStudioSettings(containerEl: HTMLElement): void {
-        const settings = this.settingsService.getSettings();
-
-        // Port Setting
-        new Setting(containerEl)
-            .setName('LM Studio port')
-            .setDesc('Enter the port number for your local LM Studio instance')
-            .addText(text => {
-                text
-                    .setPlaceholder('1234')
-                    .setValue(settings.lmStudio.port)
-                    .onChange(async (value) => {
-                        await this.settingsService.updateLMStudioSettings(
-                            value,
-                            settings.lmStudio.modelName
-                        );
-                    });
-            });
-
-        // Model Name Setting
-        new Setting(containerEl)
-            .setName('Model name')
-            .setDesc('Enter the name of your local model')
-            .addText(text => {
-                text
-                    .setPlaceholder('Model name')
-                    .setValue(settings.lmStudio.modelName)
-                    .onChange(async (value) => {
-                        await this.settingsService.updateLMStudioSettings(
-                            settings.lmStudio.port,
-                            value
-                        );
-                    });
-            });
-
-        // Add test connection button
-        new Setting(containerEl)
-            .addButton(button => {
-                button
-                    .setButtonText('Test connection')
-                    .onClick(async () => {
-                        await this.handleTestConnection(button);
-                    });
-            });
+    private getProviderInfo(provider: AIProvider): { name: string; keyUrl: string } {
+        const providerMap = {
+            [AIProvider.OpenRouter]: { name: 'OpenRouter', keyUrl: 'https://openrouter.ai/keys' },
+            [AIProvider.OpenAI]: { name: 'OpenAI', keyUrl: 'https://platform.openai.com/api-keys' },
+            [AIProvider.Anthropic]: { name: 'Anthropic', keyUrl: 'https://console.anthropic.com/settings/keys' },
+            [AIProvider.Google]: { name: 'Google Gemini', keyUrl: 'https://aistudio.google.com/app/apikey' },
+            [AIProvider.Mistral]: { name: 'Mistral', keyUrl: 'https://console.mistral.ai/api-keys/' },
+            [AIProvider.Groq]: { name: 'Groq', keyUrl: 'https://console.groq.com/keys' },
+            [AIProvider.Perplexity]: { name: 'Perplexity', keyUrl: 'https://www.perplexity.ai/settings/api' },
+            [AIProvider.Requesty]: { name: 'Requesty', keyUrl: 'https://requesty.ai/dashboard' }
+        };
+        return providerMap[provider] || { name: provider, keyUrl: '#' };
     }
+
 
     private addDefaultSettings(containerEl: HTMLElement): void {
         const settings = this.settingsService.getSettings();
 
-        // Default Model Selection (for OpenRouter and OpenAI)
-        if (settings.provider === AIProvider.OpenRouter || settings.provider === AIProvider.OpenAI) {
-            new Setting(containerEl)
-                .setName('Default model')
-                .setDesc('Select the default model to use')
-                .addDropdown(dropdown => {
-                    const models = AIModelMap[settings.provider];
+        // Default Model Selection
+        new Setting(containerEl)
+            .setName('Default model')
+            .setDesc('Select the default model to use')
+            .addDropdown(dropdown => {
+                try {
+                    const providerName = settings.provider.toLowerCase();
+                    const models = ModelRegistry.getProviderModels(providerName);
+                    
                     models.forEach(model => {
                         dropdown.addOption(model.apiName, model.name);
                     });
@@ -179,8 +148,10 @@ export class SettingTab extends PluginSettingTab {
                         .onChange(async (value) => {
                             await this.settingsService.updateSetting('defaultModel', value);
                         });
-                });
-        }
+                } catch (error) {
+                    console.warn('Failed to load models for provider:', settings.provider, error);
+                }
+            });
 
         // Default Temperature Setting
         new Setting(containerEl)
@@ -197,49 +168,17 @@ export class SettingTab extends PluginSettingTab {
             });
     }
 
-    private addOpenAISettings(containerEl: HTMLElement): void {
-        const settings = this.settingsService.getSettings();
-
-        // API Key Setting
-        new Setting(containerEl)
-            .setName('OpenAI API key')
-            .setDesc('Enter your OpenAI API key')
-            .addText(text => {
-                text
-                    .setPlaceholder('Enter API key')
-                    .setValue(settings.apiKeys[AIProvider.OpenAI])
-                    .onChange(async (value) => {
-                        await this.settingsService.setApiKey(AIProvider.OpenAI, value);
-                        // Immediately update the adapter with new key
-                        this.plugin.updateAdapterConfig();
-                    });
-                text.inputEl.type = 'password';
-            })
-            .addExtraButton(button => {
-                button
-                    .setIcon('external-link')
-                    .setTooltip('Get API key')
-                    .onClick(() => {
-                        window.open('https://platform.openai.com/api-keys');
-                    });
-            });
-
-        // Add test connection button
-        new Setting(containerEl)
-            .addButton(button => {
-                button
-                    .setButtonText('Test connection')
-                    .onClick(async () => {
-                        await this.handleTestConnection(button);
-                    });
-            });
-    }
 
     private getProviderDisplayName(provider: AIProvider): string {
         const displayNames: Record<AIProvider, string> = {
             [AIProvider.OpenRouter]: 'OpenRouter',
-            [AIProvider.LMStudio]: 'LM Studio (Local)',
-            [AIProvider.OpenAI]: 'OpenAI'
+            [AIProvider.OpenAI]: 'OpenAI',
+            [AIProvider.Anthropic]: 'Anthropic (Claude)',
+            [AIProvider.Google]: 'Google (Gemini)',
+            [AIProvider.Mistral]: 'Mistral',
+            [AIProvider.Groq]: 'Groq',
+            [AIProvider.Perplexity]: 'Perplexity',
+            [AIProvider.Requesty]: 'Requesty'
         };
         return displayNames[provider] || provider;
     }

@@ -1,8 +1,10 @@
 // src/ui/revisionModal.ts
 
 import { App, Modal, Setting, TextAreaComponent, DropdownComponent, ButtonComponent, Notice } from 'obsidian';
-import { AIProvider, AIModelMap } from '../ai/models';
-import { SettingsService } from '../settings/settings';
+import { AIProvider, SettingsService } from '../settings/settings';
+import { ModelRegistry } from '../llm-adapter-kit/adapters/ModelRegistry';
+import { ModelSpec } from '../llm-adapter-kit/adapters/modelTypes';
+import { createAdapter } from '../llm-adapter-kit/adapters';
 import { CONFIG, SuggestionPrompt } from '../config'; // Import CONFIG and SuggestionPrompt
 
 interface RevisionModalResult {
@@ -87,23 +89,31 @@ export class RevisionModal extends Modal {
 
         // Model selection (for OpenRouter and OpenAI)
         const settings = this.settingsService.getSettings();
-        if (settings.provider === AIProvider.OpenRouter || settings.provider === AIProvider.OpenAI) {
-            new Setting(contentEl)
-                .setName('AI model')
-                .setDesc('Select the model to use for revision')
-                .addDropdown(dropdown => {
-                    this.modelDropdown = dropdown;
-                    const models = AIModelMap[settings.provider];
+        new Setting(contentEl)
+            .setName('AI model')
+            .setDesc('Select the model to use for revision')
+            .addDropdown(dropdown => {
+                this.modelDropdown = dropdown;
+                try {
+                    const providerName = settings.provider.toLowerCase();
+                    const models = ModelRegistry.getProviderModels(providerName);
+                    
                     models.forEach(model => {
                         dropdown.addOption(model.apiName, model.name);
                     });
+                    
                     dropdown
                         .setValue(this.result.model)
                         .onChange(value => {
                             this.result.model = value;
                         });
-                });
-        }
+                } catch (error) {
+                    console.warn('Failed to load models for provider:', settings.provider, error);
+                    // Add a fallback option
+                    dropdown.addOption(settings.defaultModel, 'Default Model');
+                    dropdown.setValue(settings.defaultModel);
+                }
+            });
 
         // Temperature control
         new Setting(contentEl)
